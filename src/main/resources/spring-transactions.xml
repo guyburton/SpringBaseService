@@ -25,12 +25,12 @@
         <!-- IMPORTANT: disable startup because the userTransactionService above does this -->
         <property name="startupTransactionService" value="false"/>
         <property name="forceShutdown" value="false"/>
-    </bean>
 
+    </bean>
     <!--
-         Also use Atomikos UserTransactionImp,
-         needed to configure Spring
-    -->
+             Also use Atomikos UserTransactionImp,
+             needed to configure Spring
+        -->
     <bean id="AtomikosUserTransaction"
           class="com.atomikos.icatch.jta.UserTransactionImp"
           depends-on="userTransactionService">

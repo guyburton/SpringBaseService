@@ -2,7 +2,6 @@ package test.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import test.entities.MyEntity;
 import test.persistence.MyEntityRepository;
@@ -14,7 +13,7 @@ import java.util.Date;
  * Date: 15/08/2013
  */
 @Component
-@Transactional(isolation = Isolation.READ_UNCOMMITTED)
+@Transactional
 public class MyService {
 
     @Autowired
