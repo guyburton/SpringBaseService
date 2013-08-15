@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <bean id="userTransactionService"
+          class="com.atomikos.icatch.config.UserTransactionServiceImp"
+          init-method="init" destroy-method="shutdownForce">
+        <constructor-arg>
+            <props>
+                <prop key="com.atomikos.icatch.service">
+                    com.atomikos.icatch.standalone.UserTransactionServiceFactory
+                </prop>
+                <prop key="com.atomikos.icatch.log_base_dir">atomikos</prop>
+            </props>
+        </constructor-arg>
+    </bean>
+    <bean id="AtomikosTransactionManager"
+          class="com.atomikos.icatch.jta.UserTransactionManager"
+          init-method="init" destroy-method="close"
+          depends-on="userTransactionService">
+        <!-- IMPORTANT: disable startup because the userTransactionService above does this -->
+        <property name="startupTransactionService" value="false"/>
+        <property name="forceShutdown" value="false"/>
+    </bean>
+
+    <!--
+         Also use Atomikos UserTransactionImp,
+         needed to configure Spring
+    -->
+    <bean id="AtomikosUserTransaction"
+          class="com.atomikos.icatch.jta.UserTransactionImp"
+          depends-on="userTransactionService">
+        <property name="transactionTimeout" value="1000"/>
+    </bean>
+
+    <!--
+       Configure the Spring framework to use JTA transactions from Atomikos
+    -->
+    <bean id="JtaTransactionManager" name="transactionManager"
+          class="org.springframework.transaction.jta.JtaTransactionManager"
+          depends-on="userTransactionService">
+        <property name="transactionManager" ref="AtomikosTransactionManager"/>
+        <property name="userTransaction" ref="AtomikosUserTransaction"/>
+    </bean>
+
+    <tx:annotation-driven/>
+
+</beans>
