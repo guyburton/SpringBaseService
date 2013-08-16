@@ -7,9 +7,11 @@
                                  http://www.springframework.org/schema/context
                                  http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <import resource="spring-persistence.xml" />
+    <!-- must initialise atomikos/JTA before JPA -->
     <import resource="spring-transactions.xml" />
+    <import resource="spring-persistence.xml" />
 
+    <context:load-time-weaver/>
     <context:component-scan base-package="test.service"/>
     <context:annotation-config />
 </beans>

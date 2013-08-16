@@ -7,17 +7,11 @@
                                  http://www.springframework.org/schema/beans/spring-beans.xsd
                                  http://www.springframework.org/schema/jdbc
                                  http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
-
-
                                  http://www.springframework.org/schema/data/jpa
                                  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
-    <jdbc:embedded-database id="dataSource" type="HSQL">
-    </jdbc:embedded-database>
-
-    <bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
-        <property name="showSql" value="true" />
-        <property name="generateDdl" value="true"/>
+    <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaDialect">
+        <property name="lazyDatabaseTransaction" value="true"></property>
     </bean>
 
     <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -26,15 +20,36 @@
                 <value>test.entities</value>
             </list>
         </property>
-        <property name="dataSource" ref="dataSource"/>
-        <property name="persistenceUnitName" value="mypersistenceunit"/>
-        <property name="jpaVendorAdapter" ref="jpaAdapter" />
-        <property name="loadTimeWeaver">
-            <bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
+        <property name="jtaDataSource">
+            <bean class="com.atomikos.jdbc.AtomikosDataSourceBean">
+                <property name="xaDataSource">
+                    <bean class="org.h2.jdbcx.JdbcDataSource">
+                        <property name="URL" value="jdbc:h2:mem:myAppDatabase;DB_CLOSE_DELAY=-1;TRACE_LEVEL_FILE=4"></property>
+                    </bean>
+                </property>
+                <property name="uniqueResourceName" value="db"/>
+            </bean>
         </property>
+        <property name="persistenceUnitName" value="mypersistenceunit"/>
+
+        <property name="jpaVendorAdapter">
+            <bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
+                <property name="showSql" value="true" />
+                <property name="generateDdl" value="true"/>
+                <property name="databasePlatform" value="org.eclipse.persistence.platform.database.H2Platform"/>
+            </bean>
+        </property>
+        <!-- see http://www.eclipse.org/eclipselink/api/2.4/org/eclipse/persistence/config/PersistenceUnitProperties.html -->
+        <property name="jpaProperties">
+            <props>
+                <prop key="eclipselink.cache.shared.default">false</prop>
+                <prop key="eclipselink.transaction.join-existing">true</prop>
+                <prop key="eclipselink.target-server">com.atomikos.eclipselink.platform.AtomikosPlatform</prop>
+                <prop key="eclipselink.target-database">org.eclipse.persistence.platform.database.H2Platform</prop>
+                <prop key="javax.persistence.transactionType">JTA</prop>
+            </props>
+        </property>
+        <property name="jpaDialect" ref="jpaDialect"/>
     </bean>
-
-    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
-
     <jpa:repositories base-package="test.persistence" />
 </beans>

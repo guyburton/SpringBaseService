@@ -13,7 +13,7 @@ import java.util.Date;
 public class MyEntity {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @GeneratedValue(strategy=GenerationType.TABLE)
     private Long id;
 
     private String name;

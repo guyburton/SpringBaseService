@@ -6,26 +6,17 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/tx
                            http://www.springframework.org/schema/tx/spring-tx.xsd">
+
     <bean id="userTransactionService"
           class="com.atomikos.icatch.config.UserTransactionServiceImp"
           init-method="init" destroy-method="shutdownForce">
         <constructor-arg>
             <props>
-                <prop key="com.atomikos.icatch.service">
-                    com.atomikos.icatch.standalone.UserTransactionServiceFactory
-                </prop>
+                <prop key="com.atomikos.icatch.service">com.atomikos.icatch.standalone.UserTransactionServiceFactory</prop>
                 <prop key="com.atomikos.icatch.log_base_dir">atomikos</prop>
+                <prop key="com.atomikos.icatch.console_log_level">DEBUG</prop>
             </props>
         </constructor-arg>
-    </bean>
-    <bean id="AtomikosTransactionManager"
-          class="com.atomikos.icatch.jta.UserTransactionManager"
-          init-method="init" destroy-method="close"
-          depends-on="userTransactionService">
-        <!-- IMPORTANT: disable startup because the userTransactionService above does this -->
-        <property name="startupTransactionService" value="false"/>
-        <property name="forceShutdown" value="false"/>
-
     </bean>
     <!--
              Also use Atomikos UserTransactionImp,
@@ -37,16 +28,39 @@
         <property name="transactionTimeout" value="1000"/>
     </bean>
 
+    <bean id="AtomikosTransactionManager"
+          class="com.atomikos.icatch.jta.UserTransactionManager"
+          init-method="init" destroy-method="close"
+          depends-on="userTransactionService">
+
+        <property name="startupTransactionService" value="false"/>
+        <property name="forceShutdown" value="false" />
+    </bean>
+
+
     <!--
        Configure the Spring framework to use JTA transactions from Atomikos
     -->
     <bean id="JtaTransactionManager" name="transactionManager"
           class="org.springframework.transaction.jta.JtaTransactionManager"
           depends-on="userTransactionService">
-        <property name="transactionManager" ref="AtomikosTransactionManager"/>
-        <property name="userTransaction" ref="AtomikosUserTransaction"/>
+        <property name="allowCustomIsolationLevels" value="true" />
+        <property name="transactionManager" ref="AtomikosTransactionManager" />
+        <property name="userTransaction" ref="AtomikosUserTransaction" />
+        <property name="transactionSynchronizationName" value="SYNCHRONIZATION_ON_ACTUAL_TRANSACTION" />
     </bean>
 
     <tx:annotation-driven/>
 
+    <!--
+    <tx:advice id="txAdvice" >
+        <tx:attributes>
+            <tx:method name="*" propagation="MANDATORY"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:pointcut id="fooServiceOperation" expression="this(test.persistence.MyEntityRepository)"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="fooServiceOperation"/>
+    </aop:config>        -->
 </beans>
