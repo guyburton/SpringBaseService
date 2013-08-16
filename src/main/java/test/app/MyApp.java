@@ -13,7 +13,7 @@ public class MyApp {
         ApplicationContext context = new GenericXmlApplicationContext("spring-config.xml");
 
         MyService myService = context.getBean(MyService.class);
-        Long newEntityId = myService.createAnEntity();
-        myService.doSomethingToAnEntity(newEntityId);
+        Long newEntityId = myService.create();
+        myService.update(newEntityId);
     }
 }
