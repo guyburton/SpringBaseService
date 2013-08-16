@@ -3,4 +3,11 @@ SpringBaseService
 
 Basic Spring transactional service host configuration.
 
-This is a personal experiment with Spring, integrating a few different technologies.
+This is a personal experiment with Spring, integrating a few different technologies. It's sometimes hard to find examples of specific configurations like this, so thought it was worth sharing.
+
+* Eclipselink JPA
+* H2 Embedded Database
+* Atomikos standalone JTA Transaction Manager
+* Spring application context & IoC
+* Spring Data (repository)
+* Spring Test
