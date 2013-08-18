@@ -21,10 +21,11 @@
             </list>
         </property>
         <property name="jtaDataSource">
-            <bean class="com.atomikos.jdbc.AtomikosDataSourceBean">
+            <bean class="com.atomikos.jdbc.AtomikosDataSourceBean"
+                    destroy-method="close">
                 <property name="xaDataSource">
                     <bean class="org.h2.jdbcx.JdbcDataSource">
-                        <property name="URL" value="jdbc:h2:mem:myAppDatabase;DB_CLOSE_DELAY=-1;TRACE_LEVEL_FILE=4"></property>
+                        <property name="URL" value="jdbc:h2:mem:myAppDatabase;TRACE_LEVEL_FILE=4"></property>
                     </bean>
                 </property>
                 <property name="uniqueResourceName" value="db"/>

@@ -5,10 +5,10 @@ import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,8 @@ import static org.hamcrest.Matchers.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring-config.xml")
 @TransactionConfiguration(transactionManager="transactionManager", defaultRollback=true)
-@Transactional
+//http://forum.springsource.org/showthread.php?80440-Integration-testing-with-transactions-on-multiple-threads
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TestMyService {
 
     @Test public void
@@ -34,7 +35,6 @@ public class TestMyService {
             equalTo(200));
     }
 
-    // currently failing because transaction of test is on different thread to http request handler
     @Test public void
     emptyCollectionHandled() {
         assertThat(
@@ -43,7 +43,6 @@ public class TestMyService {
         );
     }
 
-    // currently failing because transaction of test is on different thread to http request handler
     @SuppressWarnings("unchecked")
     @Test public void
     retrieveItem() {
