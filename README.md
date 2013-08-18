@@ -11,3 +11,5 @@ This is a personal experiment with Spring, integrating a few different technolog
 * Spring application context & IoC
 * Spring Data (repository)
 * Spring Test
+* Apache CXF JAX-RS web server (REST)
+* Apache CXF Web Client JAX-RS REST client
